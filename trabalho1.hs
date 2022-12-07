@@ -28,11 +28,39 @@ pertencer nome (a:as) | nome == fst(a) = True
 --                                                    | medicamento /= fst(a) = comprarMedicamento medicamento quantidade (as)
 --                                                    | medicamento == fst(a) = [(medicamento, quantidade + snd(a))] ++ (a:as)
 
-   
+
 comprarMedicamento :: Medicamento -> Quantidade -> EstoqueMedicamentos -> EstoqueMedicamentos
-lista :: EstoqueMedicamentos
-lista = []
-comprarMedicamento medicamento quantidade [] = [(medicamento, quantidade)] ++ lista
+comprarMedicamento medicamento quantidade [] = [(medicamento, quantidade)]
 comprarMedicamento medicamento quantidade (a:as)   | pertencer medicamento (a:as) == False = [(medicamento, quantidade)] ++ (a:as)
-                                                   | medicamento /= fst(a) = comprarMedicamento medicamento quantidade (as)
-                                                   | otherwise = (snd(a) +)
+                                                   | medicamento == fst(a) = (medicamento, quantidade + snd(a)) : (as)
+                                                   | otherwise = a : (as)
+
+tomarMedicamento :: Medicamento -> EstoqueMedicamentos -> Maybe EstoqueMedicamentos
+tomarMedicamento medicamento [] = Nothing
+tomarMedicamento medicamento (a:as) | pertencer medicamento (a:as) == False = Nothing
+                                    | medicamento == fst(a) = Just ((medicamento, snd(a) - 1) : (as))
+
+consultarMedicamento :: Medicamento -> EstoqueMedicamentos -> Quantidade
+consultarMedicamento = undefined
+
+double :: [Int] -> [Int]
+double [] = []
+double (a:as) = (a*2) : double (as)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
