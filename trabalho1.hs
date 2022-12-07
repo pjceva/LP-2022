@@ -16,7 +16,23 @@ type Medicamento = String
 type Quantidade = Int
 type EstoqueMedicamentos = [(Medicamento, Quantidade)]
 
+--funcao para checar medicamento existe na lista
+pertencer :: String -> [(String, Int)] -> Bool
+pertencer nome [] = False
+pertencer nome (a:as) | nome == fst(a) = True 
+                      | otherwise = pertencer nome (as)
+
+-- comprarMedicamento :: Medicamento -> Quantidade -> EstoqueMedicamentos -> EstoqueMedicamentos
+-- comprarMedicamento medicamento quantidade [] = [(medicamento, quantidade)]
+-- comprarMedicamento medicamento quantidade (a:as)   | pertencer medicamento (a:as) == False = [(medicamento, quantidade)] ++ (a:as)
+--                                                    | medicamento /= fst(a) = comprarMedicamento medicamento quantidade (as)
+--                                                    | medicamento == fst(a) = [(medicamento, quantidade + snd(a))] ++ (a:as)
+
+   
 comprarMedicamento :: Medicamento -> Quantidade -> EstoqueMedicamentos -> EstoqueMedicamentos
-comprarMedicamento medicamento quantidade [] = [(medicamento, quantidade)]
-
-
+lista :: EstoqueMedicamentos
+lista = []
+comprarMedicamento medicamento quantidade [] = [(medicamento, quantidade)] ++ lista
+comprarMedicamento medicamento quantidade (a:as)   | pertencer medicamento (a:as) == False = [(medicamento, quantidade)] ++ (a:as)
+                                                   | medicamento /= fst(a) = comprarMedicamento medicamento quantidade (as)
+                                                   | otherwise = (snd(a) +)
