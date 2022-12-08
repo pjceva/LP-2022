@@ -1,20 +1,11 @@
-{-
-   QUESTÃO 1, VALOR: 1,0 ponto
-
-Defina a função "comprarMedicamento", cujo tipo é dado abaixo e que, a partir de um medicamento, uma quantidade e um
-estoque inicial de medicamentos, retorne um novo estoque de medicamentos contendo o medicamento adicionado da referida
-quantidade. Se o medicamento já existir na lista de medicamentos, então a sua quantidade deve ser atualizada no novo estoque.
-Caso o remédio ainda não exista no estoque, o novo estoque a ser retornado deve ter o remédio e sua quantidade como cabeça.
-
--}
-
---fazer funcao para checar existencia na lista
---caso nao exista -> ++ (medicamento, quantidade)
---caso exista -> substitiu (medicamento, quantidade)
+import Data.List
 
 type Medicamento = String
 type Quantidade = Int
 type EstoqueMedicamentos = [(Medicamento, Quantidade)]
+type Horario = Int
+type Prescricao = (Medicamento, [Horario])
+type Receituario = [Prescricao]
 
 --funcao para checar medicamento existe na lista
 pertencer :: String -> [(String, Int)] -> Bool
@@ -48,29 +39,18 @@ consultarMedicamento medicamento [] = 0
 consultarMedicamento medicamento (a:as)   | medicamento == fst(a) = snd(a)
                                           | otherwise = consultarMedicamento medicamento (as)
 
---Questao 4 -> fazendo
+--Questao 4 -> certo
 demandaMedicamentos :: Receituario -> EstoqueMedicamentos
-demandaMedicamentos = undefined
+demandaMedicamentos [] = []
+demandaMedicamentos (a:as) = sort ((fst(a), length(snd(a))) : demandaMedicamentos (as))
+
+--Questao 5 -> fazendo
+
+
+
 
 
 double :: [Int] -> [Int]
 double [] = []
 double (a:as) = (a*2) : double (as)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
