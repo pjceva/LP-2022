@@ -28,20 +28,30 @@ pertencer nome (a:as) | nome == fst(a) = True
 --                                                    | medicamento /= fst(a) = comprarMedicamento medicamento quantidade (as)
 --                                                    | medicamento == fst(a) = [(medicamento, quantidade + snd(a))] ++ (a:as)
 
-
+--Questao 1 -> certo
 comprarMedicamento :: Medicamento -> Quantidade -> EstoqueMedicamentos -> EstoqueMedicamentos
 comprarMedicamento medicamento quantidade [] = [(medicamento, quantidade)]
 comprarMedicamento medicamento quantidade (a:as)   | pertencer medicamento (a:as) == False = [(medicamento, quantidade)] ++ (a:as)
                                                    | medicamento == fst(a) = (medicamento, quantidade + snd(a)) : (as)
-                                                   | otherwise = a : (as)
+                                                   | otherwise = a : comprarMedicamento medicamento quantidade (as)
 
+
+--Questao 2 -> ainda tem um erro mas o corretor nao pegou (ver depois)
 tomarMedicamento :: Medicamento -> EstoqueMedicamentos -> Maybe EstoqueMedicamentos
 tomarMedicamento medicamento [] = Nothing
 tomarMedicamento medicamento (a:as) | pertencer medicamento (a:as) == False = Nothing
                                     | medicamento == fst(a) = Just ((medicamento, snd(a) - 1) : (as))
 
+--Questao 3 -> certo
 consultarMedicamento :: Medicamento -> EstoqueMedicamentos -> Quantidade
-consultarMedicamento = undefined
+consultarMedicamento medicamento [] = 0
+consultarMedicamento medicamento (a:as)   | medicamento == fst(a) = snd(a)
+                                          | otherwise = consultarMedicamento medicamento (as)
+
+--Questao 4 -> fazendo
+demandaMedicamentos :: Receituario -> EstoqueMedicamentos
+demandaMedicamentos = undefined
+
 
 double :: [Int] -> [Int]
 double [] = []
