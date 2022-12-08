@@ -13,11 +13,6 @@ pertencer nome [] = False
 pertencer nome (a:as) | nome == fst(a) = True 
                       | otherwise = pertencer nome (as)
 
--- comprarMedicamento :: Medicamento -> Quantidade -> EstoqueMedicamentos -> EstoqueMedicamentos
--- comprarMedicamento medicamento quantidade [] = [(medicamento, quantidade)]
--- comprarMedicamento medicamento quantidade (a:as)   | pertencer medicamento (a:as) == False = [(medicamento, quantidade)] ++ (a:as)
---                                                    | medicamento /= fst(a) = comprarMedicamento medicamento quantidade (as)
---                                                    | medicamento == fst(a) = [(medicamento, quantidade + snd(a))] ++ (a:as)
 
 --Questao 1 -> certo
 comprarMedicamento :: Medicamento -> Quantidade -> EstoqueMedicamentos -> EstoqueMedicamentos
@@ -45,9 +40,17 @@ demandaMedicamentos [] = []
 demandaMedicamentos (a:as) = sort ((fst(a), length(snd(a))) : demandaMedicamentos (as))
 
 --Questao 5 -> fazendo
+-- Tem que estar em ordem alfabetica (certo)
+-- horarios em order tambem
 
+checarOrdemAlfabetica :: Receituario -> Bool
+checarOrdemAlfabetica [] = True
+checarOrdemAlfabetica (a:as)  | a:as == sort(a:as) = True
+                              | otherwise = False
 
-
+receituarioValido :: Receituario -> Bool
+receituarioValido [] = True
+receituarioValido (a:as) = checarOrdemAlfabetica (a:as)
 
 
 double :: [Int] -> [Int]
