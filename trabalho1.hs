@@ -48,9 +48,14 @@ checarOrdemAlfabetica [] = True
 checarOrdemAlfabetica (a:as)  | a:as == sort(a:as) = True
                               | otherwise = False
 
+checarOrdemCrescente :: Receituario -> Bool
+checarOrdemCrescente [] = True
+checarOrdemCrescente (a:as) | snd(a) == sort(snd(a)) = checarOrdemCrescente (as)
+                            | otherwise = False
+
 receituarioValido :: Receituario -> Bool
 receituarioValido [] = True
-receituarioValido (a:as) = checarOrdemAlfabetica (a:as)
+receituarioValido (a:as) = checarOrdemAlfabetica (a:as) && checarOrdemCrescente (a:as)
 
 
 double :: [Int] -> [Int]
