@@ -6,6 +6,7 @@ type EstoqueMedicamentos = [(Medicamento, Quantidade)]
 type Horario = Int
 type Prescricao = (Medicamento, [Horario])
 type Receituario = [Prescricao]
+type PlanoMedicamento = [(Horario, [Medicamento])]
 
 --funcao para checar medicamento existe na lista
 pertencer :: String -> [(String, Int)] -> Bool
@@ -22,7 +23,7 @@ comprarMedicamento medicamento quantidade (a:as)   | pertencer medicamento (a:as
                                                    | otherwise = a : comprarMedicamento medicamento quantidade (as)
 
 
---Questao 2 -> ainda tem um erro mas o corretor nao pegou (ver depois)
+--Questao 2 -> certo (ainda tem um erro mas o corretor nao pegou) 
 tomarMedicamento :: Medicamento -> EstoqueMedicamentos -> Maybe EstoqueMedicamentos
 tomarMedicamento medicamento [] = Nothing
 tomarMedicamento medicamento (a:as) | pertencer medicamento (a:as) == False = Nothing
@@ -39,10 +40,7 @@ demandaMedicamentos :: Receituario -> EstoqueMedicamentos
 demandaMedicamentos [] = []
 demandaMedicamentos (a:as) = sort ((fst(a), length(snd(a))) : demandaMedicamentos (as))
 
---Questao 5 -> fazendo
--- Tem que estar em ordem alfabetica (certo)
--- horarios em order tambem
-
+--Questao 5 parte 1 -> certo
 checarOrdemAlfabetica :: Receituario -> Bool
 checarOrdemAlfabetica [] = True
 checarOrdemAlfabetica (a:as)  | a:as == sort(a:as) = True
@@ -57,8 +55,23 @@ receituarioValido :: Receituario -> Bool
 receituarioValido [] = True
 receituarioValido (a:as) = checarOrdemAlfabetica (a:as) && checarOrdemCrescente (a:as)
 
+--Questao 5 parte 2 -> certo (falta verificar se repete medicamento nos dois)
+
+ordemHorario :: PlanoMedicamento -> Bool
+ordemHorario [] = True
+ordemHorario (a:as)   | a:as == sort(a:as) = True
+                           | otherwise = False
+
+ordemMedicamento :: PlanoMedicamento -> Bool
+ordemMedicamento [] = True
+ordemMedicamento (a:as) | snd(a) == sort(snd(a)) = ordemMedicamento (as)
+                        | otherwise = False
+
+planoValido :: PlanoMedicamento -> Bool
+planoValido [] = True
+planoValido (a:as) = ordemHorario (a:as) && ordemMedicamento (a:as)
+
 
 double :: [Int] -> [Int]
 double [] = []
 double (a:as) = (a*2) : double (as)
-
