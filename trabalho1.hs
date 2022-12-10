@@ -66,7 +66,6 @@ receituarioValido [] = True
 receituarioValido (a:as) = checarOrdemAlfabetica (a:as) && checarOrdemCrescente (a:as)
 
 --Questao 5 parte 2 -> certo (falta verificar se repete medicamento nos dois)
-
 ordemHorario :: PlanoMedicamento -> Bool
 ordemHorario [] = True
 ordemHorario (a:as)   | a:as == sort(a:as) = True
@@ -81,8 +80,8 @@ planoValido :: PlanoMedicamento -> Bool
 planoValido [] = True
 planoValido (a:as) = ordemHorario (a:as) && ordemMedicamento (a:as)
 
---Questão 7
 
+--Questão 7
 horarios :: Receituario -> [Int]
 horarios [] = []
 horarios (a:as) = snd(a) ++ horarios (as)
@@ -90,7 +89,7 @@ horarios (a:as) = snd(a) ++ horarios (as)
 rmdups :: (Ord a) => [a] -> [a] --colocar em ordem e tirar repetidos
 rmdups = map head . group . sort
 
-listaHorarios :: Receituario -> [Int]
+listaHorarios :: Receituario -> [Int] --Lista com todos os horarios em ordem sem repeticao
 listaHorarios [] = []
 listaHorarios (a:as) = rmdups (horarios(a:as))
 
@@ -113,6 +112,43 @@ iteraLista (a:as) x = (a, listaMedicamentos a x) : iteraLista as x
 geraPlanoReceituario :: Receituario -> PlanoMedicamento
 geraPlanoReceituario [] = []
 geraPlanoReceituario x = iteraLista (listaHorarios(x)) x
+
+
+{- QUESTÃO 8  VALOR: 1,0 ponto
+
+ Defina a função "geraReceituarioPlano", cujo tipo é dado abaixo e que retorna um receituário válido a partir de um
+ plano de medicamentos válido.
+ Dica: Existe alguma relação de simetria entre o receituário e o plano de medicamentos? Caso exista, essa simetria permite
+ compararmos a função geraReceituarioPlano com a função geraPlanoReceituario ? Em outras palavras, podemos definir
+ geraReceituarioPlano com base em geraPlanoReceituario ?
+
+-}
+
+medicamentos :: PlanoMedicamento -> [String]
+medicamentos [] = []
+medicamentos (a:as) = snd(a) ++ medicamentos (as)
+
+totalMed :: PlanoMedicamento -> [String] --Lista com todos os remedios em ordem sem repeticao
+totalMed [] = []
+totalMed x = rmdups(medicamentos x)
+
+acharMedicamento :: String -> [String] -> Bool
+acharMedicamento _ [] = False
+acharMedicamento x (a:as) = elem x (a:as)
+
+listaH :: String -> PlanoMedicamento -> [Horario] --Retorna lista de horarios de certo medicamento
+listaH _ [] = []
+listaH x (a:as) | acharMedicamento x (snd(a)) == False = listaH x (as)
+                | otherwise = fst(a) : listaH x (as)
+
+iteraMed :: [String] -> PlanoMedicamento -> Receituario
+iteraMed [] _ = []
+iteraMed (a:as) x = (a, listaH a x) : iteraMed as x
+
+
+geraReceituarioPlano :: PlanoMedicamento -> Receituario
+geraReceituarioPlano [] = [] 
+geraReceituarioPlano x = iteraMed (totalMed(x)) x
 
 double :: [Int] -> [Int]
 double [] = []
