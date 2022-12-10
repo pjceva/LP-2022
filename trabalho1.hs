@@ -81,6 +81,38 @@ planoValido :: PlanoMedicamento -> Bool
 planoValido [] = True
 planoValido (a:as) = ordemHorario (a:as) && ordemMedicamento (a:as)
 
+--Questão 7
+
+horarios :: Receituario -> [Int]
+horarios [] = []
+horarios (a:as) = snd(a) ++ horarios (as)
+
+rmdups :: (Ord a) => [a] -> [a] --colocar em ordem e tirar repetidos
+rmdups = map head . group . sort
+
+listaHorarios :: Receituario -> [Int]
+listaHorarios [] = []
+listaHorarios (a:as) = rmdups (horarios(a:as))
+
+achar :: Int -> [Int] -> Bool
+achar _ [] = False
+achar n (x:xs)
+  | x == n = True
+  | otherwise = achar n xs
+
+--recebe o primeiro elemento da lista ordenada e retorna o elemento junto com um conjunto de medicamentos (chamar recursivamente por outra funcao q itera a lista)
+listaMedicamentos :: Int -> Receituario -> [Medicamento]
+listaMedicamentos _ [] = []
+listaMedicamentos x (a:as)  | achar x (snd(a)) == False = listaMedicamentos x (as)
+                            | otherwise = fst(a) : listaMedicamentos x (as)
+
+iteraLista :: [Int] -> Receituario -> PlanoMedicamento
+iteraLista [] _ = []
+iteraLista (a:as) x = (a, listaMedicamentos a x) : iteraLista as x
+
+geraPlanoReceituario :: Receituario -> PlanoMedicamento
+geraPlanoReceituario [] = []
+geraPlanoReceituario x = iteraLista (listaHorarios(x)) x
 
 double :: [Int] -> [Int]
 double [] = []
