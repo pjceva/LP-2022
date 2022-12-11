@@ -17,6 +17,12 @@ instance Show Cuidado where
       ++ m
   show (Medicar m) = "Ministrar medicamento: " ++ m
 
+--coloca em ordem e tira repetidos
+rmdups :: (Ord a) => [a] -> [a]
+rmdups = map head . group . sort
+
+
+--Questao 1 -> certo
 
 --funcao para checar medicamento existe na lista
 pertencer :: String -> [(String, Int)] -> Bool
@@ -24,131 +30,146 @@ pertencer nome [] = False
 pertencer nome (a:as) | nome == fst(a) = True 
                       | otherwise = pertencer nome (as)
 
-
---Questao 1 -> certo
 comprarMedicamento :: Medicamento -> Quantidade -> EstoqueMedicamentos -> EstoqueMedicamentos
 comprarMedicamento medicamento quantidade [] = [(medicamento, quantidade)]
-comprarMedicamento medicamento quantidade (a:as)   | pertencer medicamento (a:as) == False = [(medicamento, quantidade)] ++ (a:as)
-                                                   | medicamento == fst(a) = (medicamento, quantidade + snd(a)) : (as)
-                                                   | otherwise = a : comprarMedicamento medicamento quantidade (as)
+comprarMedicamento medicamento quantidade (a:as)  | pertencer medicamento (a:as) == False = [(medicamento, quantidade)] ++ (a:as)
+                                                  | medicamento == fst(a) = (medicamento, quantidade + snd(a)) : (as)
+                                                  | otherwise = a : comprarMedicamento medicamento quantidade (as)
 
 
---Questao 2 -> certo (ainda tem um erro mas o corretor nao pegou) 
+--Questao 2
 tomarMedicamento :: Medicamento -> EstoqueMedicamentos -> Maybe EstoqueMedicamentos
 tomarMedicamento medicamento [] = Nothing
 tomarMedicamento medicamento (a:as) | pertencer medicamento (a:as) == False = Nothing
                                     | medicamento == fst(a) = Just ((medicamento, snd(a) - 1) : (as))
 
---Questao 3 -> certo
+--Questao 3
 consultarMedicamento :: Medicamento -> EstoqueMedicamentos -> Quantidade
 consultarMedicamento medicamento [] = 0
 consultarMedicamento medicamento (a:as)   | medicamento == fst(a) = snd(a)
                                           | otherwise = consultarMedicamento medicamento (as)
 
---Questao 4 -> certo
+--Questao 4
 demandaMedicamentos :: Receituario -> EstoqueMedicamentos
 demandaMedicamentos [] = []
-demandaMedicamentos (a:as) = sort ((fst(a), length(snd(a))) : demandaMedicamentos (as))
+demandaMedicamentos (a:as) = rmdups ((fst(a), length(snd(a))) : demandaMedicamentos (as))
 
---Questao 5 parte 1 -> certo
-checarOrdemAlfabetica :: Receituario -> Bool
+--Questao 5 parte 1
+
+--Gera uma lista com todos os medicamentos do receituario
+listaMeds :: Receituario -> [String]
+listaMeds [] = []
+listaMeds (a:as) = fst(a) : listaMeds(as)
+
+--checa se esta em ordem e se todos os elementos sao distintos
+checarOrdemAlfabetica :: [String] -> Bool
 checarOrdemAlfabetica [] = True
-checarOrdemAlfabetica (a:as)  | a:as == sort(a:as) = True
+checarOrdemAlfabetica (a:as)  | a:as == rmdups(a:as) = True
                               | otherwise = False
 
 checarOrdemCrescente :: Receituario -> Bool
 checarOrdemCrescente [] = True
-checarOrdemCrescente (a:as) | snd(a) == sort(snd(a)) = checarOrdemCrescente (as)
+checarOrdemCrescente (a:as) | snd(a) == rmdups(snd(a)) = checarOrdemCrescente (as)
                             | otherwise = False
 
+--checa se as codicoes sao satisfeitas
 receituarioValido :: Receituario -> Bool
 receituarioValido [] = True
-receituarioValido (a:as) = checarOrdemAlfabetica (a:as) && checarOrdemCrescente (a:as)
+receituarioValido x = checarOrdemAlfabetica (listaMeds x) && checarOrdemCrescente x
 
---Questao 5 parte 2 -> certo (falta verificar se repete medicamento nos dois)
-ordemHorario :: PlanoMedicamento -> Bool
+--Questao 5 parte 2
+
+--Gera uma lista com todos os horarios do receituario
+listaH :: PlanoMedicamento -> [Int]
+listaH [] = []
+listaH (a:as) = fst(a) : listaH(as)
+
+--checa se esta em ordem e se todos os elementos sao distintos
+ordemHorario :: [Int] -> Bool
 ordemHorario [] = True
-ordemHorario (a:as)   | a:as == sort(a:as) = True
-                           | otherwise = False
+ordemHorario (a:as) | a:as == rmdups(a:as) = True
+                    | otherwise = False
 
 ordemMedicamento :: PlanoMedicamento -> Bool
 ordemMedicamento [] = True
-ordemMedicamento (a:as) | snd(a) == sort(snd(a)) = ordemMedicamento (as)
+ordemMedicamento (a:as) | snd(a) == rmdups(snd(a)) = ordemMedicamento (as)
                         | otherwise = False
 
+--checa se as codicoes sao satisfeitas
 planoValido :: PlanoMedicamento -> Bool
 planoValido [] = True
-planoValido (a:as) = ordemHorario (a:as) && ordemMedicamento (a:as)
+planoValido x = ordemHorario (listaH x) && ordemMedicamento x
 
 
 --Questão 7
+
+--Transforma todos os horarios em uma lista
 horarios :: Receituario -> [Int]
 horarios [] = []
 horarios (a:as) = snd(a) ++ horarios (as)
 
-rmdups :: (Ord a) => [a] -> [a] --colocar em ordem e tirar repetidos
-rmdups = map head . group . sort
+--A partir do Receiturario gera lista com todos os horarios em ordem sem repeticao
+totalHorarios :: Receituario -> [Int]
+totalHorarios [] = []
+totalHorarios (a:as) = rmdups (horarios(a:as))
 
-listaHorarios :: Receituario -> [Int] --Lista com todos os horarios em ordem sem repeticao
-listaHorarios [] = []
-listaHorarios (a:as) = rmdups (horarios(a:as))
-
+--Verifica se um numero esta na lista
 achar :: Int -> [Int] -> Bool
 achar _ [] = False
 achar n (x:xs)
   | x == n = True
   | otherwise = achar n xs
 
---recebe o primeiro elemento da lista ordenada e retorna o elemento junto com um conjunto de medicamentos (chamar recursivamente por outra funcao q itera a lista)
+--recebe o primeiro elemento da lista ordenada e retorna um conjunto de medicamentos
 listaMedicamentos :: Int -> Receituario -> [Medicamento]
 listaMedicamentos _ [] = []
 listaMedicamentos x (a:as)  | achar x (snd(a)) == False = listaMedicamentos x (as)
                             | otherwise = fst(a) : listaMedicamentos x (as)
 
+--Percorre a lista de horarios e retorna o plano de medicamento
 iteraLista :: [Int] -> Receituario -> PlanoMedicamento
 iteraLista [] _ = []
 iteraLista (a:as) x = (a, listaMedicamentos a x) : iteraLista as x
 
 geraPlanoReceituario :: Receituario -> PlanoMedicamento
 geraPlanoReceituario [] = []
-geraPlanoReceituario x = iteraLista (listaHorarios(x)) x
+geraPlanoReceituario x = iteraLista (totalHorarios(x)) x
 
+--Questao 8
 
-{- QUESTÃO 8  VALOR: 1,0 ponto
-
- Defina a função "geraReceituarioPlano", cujo tipo é dado abaixo e que retorna um receituário válido a partir de um
- plano de medicamentos válido.
- Dica: Existe alguma relação de simetria entre o receituário e o plano de medicamentos? Caso exista, essa simetria permite
- compararmos a função geraReceituarioPlano com a função geraPlanoReceituario ? Em outras palavras, podemos definir
- geraReceituarioPlano com base em geraPlanoReceituario ?
-
--}
-
+--Transforma todos os medicamentos em uma lista
 medicamentos :: PlanoMedicamento -> [String]
 medicamentos [] = []
 medicamentos (a:as) = snd(a) ++ medicamentos (as)
 
-totalMed :: PlanoMedicamento -> [String] --Lista com todos os remedios em ordem sem repeticao
+--Lista com todos os remedios em ordem sem repeticao
+totalMed :: PlanoMedicamento -> [String]
 totalMed [] = []
 totalMed x = rmdups(medicamentos x)
 
+--Verifica se um medicamento esta na lista
 acharMedicamento :: String -> [String] -> Bool
 acharMedicamento _ [] = False
 acharMedicamento x (a:as) = elem x (a:as)
 
-listaH :: String -> PlanoMedicamento -> [Horario] --Retorna lista de horarios de certo medicamento
-listaH _ [] = []
-listaH x (a:as) | acharMedicamento x (snd(a)) == False = listaH x (as)
-                | otherwise = fst(a) : listaH x (as)
+--Retorna lista de horarios de certo medicamento
+listaHorarios :: String -> PlanoMedicamento -> [Horario]
+listaHorarios _ [] = []
+listaHorarios x (a:as) | acharMedicamento x (snd(a)) == False = listaHorarios x (as)
+                | otherwise = fst(a) : listaHorarios x (as)
 
+--Percorre a lista de medicamentos e retorna um Receituario
 iteraMed :: [String] -> PlanoMedicamento -> Receituario
 iteraMed [] _ = []
-iteraMed (a:as) x = (a, listaH a x) : iteraMed as x
-
+iteraMed (a:as) x = (a, listaHorarios a x) : iteraMed as x
 
 geraReceituarioPlano :: PlanoMedicamento -> Receituario
 geraReceituarioPlano [] = [] 
 geraReceituarioPlano x = iteraMed (totalMed(x)) x
+
+--Questao 6
+
+
 
 double :: [Int] -> [Int]
 double [] = []
