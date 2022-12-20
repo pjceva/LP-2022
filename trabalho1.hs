@@ -17,6 +17,14 @@ instance Show Cuidado where
       ++ m
   show (Medicar m) = "Ministrar medicamento: " ++ m
 
+plantao1 :: Plantao
+plantao1 =
+  [ (6, [Medicar "med6"]),
+    (8, [Medicar "med4"]),
+    (17, [Medicar "med4"]),
+    (22, [Medicar "med7"])
+  ]
+
 --coloca em ordem e tira repetidos
 rmdups :: (Ord a) => [a] -> [a]
 rmdups = map head . group . sort
@@ -169,6 +177,14 @@ geraReceituarioPlano x = iteraMed (totalMed(x)) x
 
 --Questao 6
 
+horariosPlantao :: Plantao -> [Int]
+horariosPlantao [] = []
+horariosPlantao (a:as) = fst(a) : horariosPlantao(as)
+
+plantaoValido :: Plantao -> Bool
+plantaoValido [] = False
+plantaoValido x | horariosPlantao x /= rmdups(horariosPlantao x) = False
+                | otherwise = True
 
 
 double :: [Int] -> [Int]
